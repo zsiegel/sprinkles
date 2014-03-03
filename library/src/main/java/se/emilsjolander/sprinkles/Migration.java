@@ -25,6 +25,12 @@ public class Migration {
 		}
 	}
 
+    void execute(net.sqlcipher.database.SQLiteDatabase db) {
+        for (String sql : mStatements) {
+            db.execSQL(sql);
+        }
+    }
+
 	/**
 	 * Create a table
 	 *

@@ -1,7 +1,6 @@
 package se.emilsjolander.sprinkles;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sqlcipher.database.SQLiteDatabase;
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
 import se.emilsjolander.sprinkles.typeserializers.BitmapSerializer;
@@ -117,7 +117,7 @@ public final class Sprinkles {
 
         if(sDatabase == null) {
             DbOpenHelper dbOpenHelper = new DbOpenHelper(sInstance.mContext, sInstance.databaseName, sInstance.initialDatabaseVersion);
-            sDatabase = dbOpenHelper.getWritableDatabase();
+            sDatabase = dbOpenHelper.getWritableDatabase("");
         }
 
         return sDatabase;

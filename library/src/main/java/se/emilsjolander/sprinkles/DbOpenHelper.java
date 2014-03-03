@@ -1,15 +1,20 @@
 package se.emilsjolander.sprinkles;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteOpenHelper;
 
 class DbOpenHelper extends SQLiteOpenHelper {
+
     private int baseVersion;
 
     protected DbOpenHelper(Context context, String databaseName, int baseVersion) {
         super(context, databaseName, null, Sprinkles.sInstance.mMigrations.size() + baseVersion);
         this.baseVersion = baseVersion;
+    }
+
+    private DbOpenHelper(Context context) {
+        super(context, "sprinkles.db", null, Sprinkles.sInstance.mMigrations.size());
     }
 
     @Override
