@@ -24,8 +24,14 @@ import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 public final class Sprinkles {
 
+    public interface EncryptionKeyProvider {
+        public String getKey();
+    }
+
     static Sprinkles sInstance;
     static SQLiteDatabase sDatabase;
+
+    EncryptionKeyProvider provider;
 
     Context mContext;
     List<Migration> mMigrations = new ArrayList<Migration>();
@@ -68,8 +74,13 @@ public final class Sprinkles {
      *
      * The default DB name is "sprinkles.db".
      */
-    public static synchronized Sprinkles init(Context context) {
-        return init(context, "sprinkles.db", 0);
+    public static Sprinkles init(Context context) {
+        return init(context, "sprinkles.db", 0, new EncryptionKeyProvider(){
+            @Override
+            public String getKey() {
+                return "sprinkles";
+            }
+        });
     }
 
     /**
@@ -88,10 +99,11 @@ public final class Sprinkles {
      *
      * @return The singleton Sprinkles instance.
      */
-    public static synchronized Sprinkles init(Context context, String databaseName, int initialDatabaseVersion) {
+    public static synchronized Sprinkles init(Context context, String databaseName, int initialDatabaseVersion, EncryptionKeyProvider provider) {
         if (sInstance == null) {
             sInstance = new Sprinkles();
         }
+        sInstance.provider = provider;
         sInstance.mContext = context.getApplicationContext();
         sInstance.databaseName = databaseName;
         sInstance.initialDatabaseVersion = initialDatabaseVersion;
@@ -117,7 +129,7 @@ public final class Sprinkles {
 
         if(sDatabase == null) {
             DbOpenHelper dbOpenHelper = new DbOpenHelper(sInstance.mContext, sInstance.databaseName, sInstance.initialDatabaseVersion);
-            sDatabase = dbOpenHelper.getWritableDatabase("");
+            sDatabase = dbOpenHelper.getWritableDatabase(sInstance.provider.getKey());
         }
 
         return sDatabase;
