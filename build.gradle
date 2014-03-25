@@ -1,28 +1,12 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url 'https://oss.sonatype.org/content/repositories/snapshots/'
-        }
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
-        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.1-SNAPSHOT'
-    }
-}
-
 def isReleaseBuild() {
     return version.contains("SNAPSHOT") == false
 }
 
 allprojects {
-    version = VERSION_NAME
-    group = GROUP
+//    version = VERSION_NAME
+//    group = GROUP
 
     repositories {
         mavenCentral()
     }
 }
-
-apply plugin: 'android-reporting'
