@@ -136,8 +136,7 @@ public final class Sprinkles {
     }
 
     /**
-     * Used by unit tests to reset sprinkles instances between tests. This method can change at any time and should
-     * never be called outside of a unit test.
+     * Resets the current instance
      */
     public static synchronized void dropInstances() {
         sInstance = null;
