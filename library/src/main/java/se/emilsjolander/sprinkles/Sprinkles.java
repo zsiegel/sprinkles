@@ -2,25 +2,18 @@ package se.emilsjolander.sprinkles;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import net.sqlcipher.SQLException;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
+import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
+import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
+import se.emilsjolander.sprinkles.typeserializers.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import net.sqlcipher.database.SQLiteDatabase;
-import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
-import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
-import se.emilsjolander.sprinkles.typeserializers.BitmapSerializer;
-import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
-import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
-import se.emilsjolander.sprinkles.typeserializers.DoubleSerializer;
-import se.emilsjolander.sprinkles.typeserializers.FloatSerializer;
-import se.emilsjolander.sprinkles.typeserializers.IntSerializer;
-import se.emilsjolander.sprinkles.typeserializers.LongSerializer;
-import se.emilsjolander.sprinkles.typeserializers.StringSerializer;
-import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
 public final class Sprinkles {
 
@@ -71,11 +64,11 @@ public final class Sprinkles {
      *
      * @param context A context which is used for database operations. This context is not saved, however it's application context is.
      * @return The singleton Sprinkles instance. Use this to add migrations.
-     *
+     * <p/>
      * The default DB name is "sprinkles.db".
      */
     public static Sprinkles init(Context context) {
-        return init(context, "sprinkles.db", 0, new EncryptionKeyProvider(){
+        return init(context, "sprinkles.db", 0, new EncryptionKeyProvider() {
             @Override
             public String getKey() {
                 return "sprinkles";
@@ -84,19 +77,12 @@ public final class Sprinkles {
     }
 
     /**
-     *
      * Initialize sprinkles so queries can be performed
      *
-     * @param context
-     *      A context which is used for database operations. This context is not saved, however it's application context is.
-     *
-     * @param databaseName
-     *     The name of the database to use.
-     *     This is useful if you start to use Sprinkles with an app with an existing DB.
-     *
-     * @param initialDatabaseVersion
-     *     The version of the existing database.
-     *
+     * @param context                A context which is used for database operations. This context is not saved, however it's application context is.
+     * @param databaseName           The name of the database to use.
+     *                               This is useful if you start to use Sprinkles with an app with an existing DB.
+     * @param initialDatabaseVersion The version of the existing database.
      * @return The singleton Sprinkles instance.
      */
     public static synchronized Sprinkles init(Context context, String databaseName, int initialDatabaseVersion, EncryptionKeyProvider provider) {
@@ -120,14 +106,15 @@ public final class Sprinkles {
 
     /**
      * Throws SprinklesNotInitializedException if you try to access the database before initializing Sprinkles.
+     *
      * @return the SQL Database used by Sprinkles.
      */
     static synchronized SQLiteDatabase getDatabase() {
-        if(sInstance == null) {
-           throw new SprinklesNotInitializedException();
+        if (sInstance == null) {
+            throw new SprinklesNotInitializedException();
         }
 
-        if(sDatabase == null) {
+        if (sDatabase == null) {
             DbOpenHelper dbOpenHelper = new DbOpenHelper(sInstance.mContext, sInstance.databaseName, sInstance.initialDatabaseVersion);
             sDatabase = dbOpenHelper.getWritableDatabase(sInstance.provider.getKey());
         }
@@ -136,9 +123,23 @@ public final class Sprinkles {
     }
 
     /**
-     * Resets the current instance
+     * @return returns true if the database is available
+     *
+     * @throws SprinklesNotInitializedException
+     * @throws SQLiteException
+     */
+    public static boolean verifyDatabase() throws SQLException, SprinklesNotInitializedException {
+        getDatabase();
+        return true;
+    }
+
+    /**
+     * Resets the current instance and closes the DB
      */
     public static synchronized void dropInstances() {
+        if (sDatabase != null) {
+            sDatabase.close();
+        }
         sInstance = null;
         sDatabase = null;
     }
@@ -162,5 +163,4 @@ public final class Sprinkles {
         }
         return typeSerializers.get(type);
     }
-
 }
