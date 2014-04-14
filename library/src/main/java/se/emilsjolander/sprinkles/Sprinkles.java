@@ -2,6 +2,7 @@ package se.emilsjolander.sprinkles;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import se.emilsjolander.sprinkles.exceptions.NoTypeSerializerFoundException;
 import se.emilsjolander.sprinkles.exceptions.SprinklesNotInitializedException;
+import se.emilsjolander.sprinkles.typeserializers.BitmapSerializer;
 import se.emilsjolander.sprinkles.typeserializers.BooleanSerializer;
 import se.emilsjolander.sprinkles.typeserializers.DateSerializer;
 import se.emilsjolander.sprinkles.typeserializers.DoubleSerializer;
@@ -20,7 +22,7 @@ import se.emilsjolander.sprinkles.typeserializers.LongSerializer;
 import se.emilsjolander.sprinkles.typeserializers.StringSerializer;
 import se.emilsjolander.sprinkles.typeserializers.TypeSerializer;
 
-public class Sprinkles {
+public final class Sprinkles {
 
     static Sprinkles sInstance;
     static SQLiteDatabase sDatabase;
@@ -55,6 +57,7 @@ public class Sprinkles {
 
         typeSerializers.put(String.class, new StringSerializer());
         typeSerializers.put(Date.class, new DateSerializer());
+        typeSerializers.put(Bitmap.class, new BitmapSerializer());
     }
 
     /**
@@ -65,7 +68,7 @@ public class Sprinkles {
      *
      * The default DB name is "sprinkles.db".
      */
-    public static Sprinkles init(Context context) {
+    public static synchronized Sprinkles init(Context context) {
         return init(context, "sprinkles.db", 0);
     }
 
@@ -85,7 +88,7 @@ public class Sprinkles {
      *
      * @return The singleton Sprinkles instance.
      */
-    public static Sprinkles init(Context context, String databaseName, int initialDatabaseVersion) {
+    public static synchronized Sprinkles init(Context context, String databaseName, int initialDatabaseVersion) {
         if (sInstance == null) {
             sInstance = new Sprinkles();
         }
@@ -99,7 +102,7 @@ public class Sprinkles {
      * Use init() instead.
      */
     @Deprecated
-    public static Sprinkles getInstance(Context context) {
+    public static synchronized Sprinkles getInstance(Context context) {
         return init(context);
     }
 
@@ -107,7 +110,7 @@ public class Sprinkles {
      * Throws SprinklesNotInitializedException if you try to access the database before initializing Sprinkles.
      * @return the SQL Database used by Sprinkles.
      */
-    static SQLiteDatabase getDatabase() {
+    static synchronized SQLiteDatabase getDatabase() {
         if(sInstance == null) {
            throw new SprinklesNotInitializedException();
         }
@@ -124,7 +127,7 @@ public class Sprinkles {
      * Used by unit tests to reset sprinkles instances between tests. This method can change at any time and should
      * never be called outside of a unit test.
      */
-    public static void dropInstances() {
+    public static synchronized void dropInstances() {
         sInstance = null;
         sDatabase = null;
     }
