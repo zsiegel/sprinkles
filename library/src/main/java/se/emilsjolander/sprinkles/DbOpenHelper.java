@@ -13,10 +13,6 @@ class DbOpenHelper extends SQLiteOpenHelper {
         this.baseVersion = baseVersion;
     }
 
-    private DbOpenHelper(Context context) {
-        super(context, "sprinkles.db", null, Sprinkles.sInstance.mMigrations.size());
-    }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         executeMigrations(db, baseVersion, Sprinkles.sInstance.mMigrations.size() + baseVersion);
