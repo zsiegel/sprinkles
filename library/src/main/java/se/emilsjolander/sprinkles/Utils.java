@@ -38,10 +38,10 @@ class Utils {
 	static String getWhereStatement(Model m) {
         final ModelInfo info = ModelInfo.from(m.getClass());
 		final StringBuilder where = new StringBuilder();
-        final Object[] args = new Object[info.primaryKeys.size()];
+        final Object[] args = new Object[info.keys.size()];
 
-		for (int i = 0; i < info.primaryKeys.size(); i++) {
-			final ModelInfo.StaticColumnField column = info.primaryKeys.get(i);
+		for (int i = 0; i < info.keys.size(); i++) {
+			final ModelInfo.ColumnField column = info.keys.get(i);
 			where.append(column.name);
 			where.append("=?");
 
@@ -53,7 +53,7 @@ class Utils {
             }
 
             // split where statements with AND
-			if (i < info.primaryKeys.size()-1) {
+			if (i < info.keys.size()-1) {
 				where.append(" AND ");
 			}
 		}
@@ -65,8 +65,8 @@ class Utils {
 		final ModelInfo info = ModelInfo.from(model.getClass());
 		final ContentValues values = new ContentValues();
 		
-		for (ModelInfo.StaticColumnField column : info.staticColumns) {
-			if (column.isAutoIncrement) {
+		for (ModelInfo.ColumnField column : info.columns) {
+			if (column.isAutoIncrement || column.isDynamic) {
 				continue;
 			}
 			column.field.setAccessible(true);
