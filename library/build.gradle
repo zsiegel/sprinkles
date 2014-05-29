@@ -18,6 +18,10 @@ repositories {
     mavenCentral()
 }
 
+configurations.compile {
+    exclude module: 'hamcrest-core'
+}
+
 dependencies {
 
     compile 'com.android.support:support-v4:19.1.+'
