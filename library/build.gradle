@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.11.+'
 //        classpath 'com.squareup.gradle:gradle-android-test-plugin:0.9.1-SNAPSHOT'
     }
 }
@@ -30,7 +30,7 @@ dependencies {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '19.1.0'
 
     sourceSets {
         main {
@@ -63,4 +63,4 @@ android {
     }
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/eaa6b5404b7594e6c23b884fdc5795f545db55dd/gradle-mvn-push.gradle'
+//apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/eaa6b5404b7594e6c23b884fdc5795f545db55dd/gradle-mvn-push.gradle'
